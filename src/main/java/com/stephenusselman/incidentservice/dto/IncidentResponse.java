@@ -1,7 +1,5 @@
 package com.stephenusselman.incidentservice.dto;
 
-import java.time.Instant;
-
 import lombok.Builder;
 import lombok.Data;
 
@@ -19,5 +17,5 @@ public class IncidentResponse {
     private String description;
 
     /** Timestamp when the incident was created */
-    private Instant createdAt;
+    private String createdAt;
 }

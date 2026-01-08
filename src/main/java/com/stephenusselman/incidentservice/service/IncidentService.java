@@ -7,22 +7,38 @@ import org.springframework.stereotype.Service;
 
 import com.stephenusselman.incidentservice.domain.Incident;
 import com.stephenusselman.incidentservice.dto.CreateIncidentRequest;
+import com.stephenusselman.incidentservice.repository.IncidentRepository;
+
+import lombok.RequiredArgsConstructor;
 
 /**
-     * Create a new incident based on the provided request data.
-     * 
-     * @param request the DTO containing the information needed to create an incident
-     * @return the newly created {@link Incident} entity
-     */
+ * Service layer for managing incidents.
+ */
 @Service
+@RequiredArgsConstructor
 public class IncidentService {
-    
+
+    private final IncidentRepository repository;
+
+    /**
+     * Creates a new incident based on the input request.
+     * 
+     * @param request the DTO containing incident details
+     * @return the created Incident entity
+     */
     public Incident createIncident(CreateIncidentRequest request) {
-        return Incident.builder()
-                .incidentId(UUID.randomUUID().toString())
-                .description(request.getDescription())
-                .reportedBy(request.getReportedBy())
-                .createdAt(Instant.now())
-                .build();
+        Incident incident = new Incident();
+        incident.setIncidentId(UUID.randomUUID().toString());
+        incident.setDescription(request.getDescription());
+        incident.setSeverity(request.getSeverity());
+        incident.setCategory(request.getCategory());
+        incident.setCreatedAt(Instant.now().toString());
+
+        repository.save(incident);
+        return incident;
+    }
+
+    public Incident getIncident(String id) {
+        return repository.findById(id);
     }
 }
