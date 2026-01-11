@@ -1,9 +1,13 @@
 package com.stephenusselman.incidentservice.controller;
 
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 import com.stephenusselman.incidentservice.domain.Incident;
 import com.stephenusselman.incidentservice.dto.CreateIncidentRequest;
@@ -42,4 +46,19 @@ public class IncidentController {
                 .createdAt(incident.getCreatedAt())
                 .build();
     }
+
+    @GetMapping("/{id}")
+    public IncidentResponse getIncident(@PathVariable String id) {
+    Incident incident = incidentService.getIncident(id);
+
+    if (incident == null) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Incident not found");
+    }
+
+    return IncidentResponse.builder()
+            .incidentId(incident.getIncidentId())
+            .description(incident.getDescription())
+            .createdAt(incident.getCreatedAt())
+            .build();
+}
 }
