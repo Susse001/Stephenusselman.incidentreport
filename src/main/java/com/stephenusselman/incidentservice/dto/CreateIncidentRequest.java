@@ -1,8 +1,9 @@
 package com.stephenusselman.incidentservice.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
@@ -13,17 +14,19 @@ import lombok.NoArgsConstructor;
 public class CreateIncidentRequest {
     
     /** Short description of the incident */
-    @NotBlank
+    @NotBlank(message = "Description is required")
+    @Size(max = 500, message = "Description cannot exceed 500 characters")
     private String description;
 
     /** Severity Level of the incident */
-    @NotBlank
+    @NotBlank(message = "Severity is required")
     private String severity;
 
     /** Category of the incident */
-    @NotBlank
+    @NotBlank(message = "Category is required")
     private String category;
 
     /** Name or identifier of the reporter submitting the incident */
+    @NotBlank(message = "ReportedBy is required")
     private String reportedBy;
 }
