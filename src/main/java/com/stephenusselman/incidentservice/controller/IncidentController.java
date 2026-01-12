@@ -1,9 +1,12 @@
 package com.stephenusselman.incidentservice.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -12,7 +15,7 @@ import org.springframework.http.HttpStatus;
 import com.stephenusselman.incidentservice.domain.Incident;
 import com.stephenusselman.incidentservice.dto.CreateIncidentRequest;
 import com.stephenusselman.incidentservice.dto.IncidentResponse;
-import com.stephenusselman.incidentservice.service.IncidentService;
+import com.stephenusselman.incidentservice.service.IncidentService; 
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/incidents")
 @RequiredArgsConstructor
 public class IncidentController {
+
     /** Service layer for handling incident-related operations */
     private final IncidentService incidentService;
 
@@ -60,5 +64,41 @@ public class IncidentController {
             .description(incident.getDescription())
             .createdAt(incident.getCreatedAt())
             .build();
-}
+    }
+
+    /**
+     * Search incidents by severity or category. Only one filter may be provided at a time.
+     *
+     * Examples:
+     *  GET /api/incidents?severity=HIGH
+     *  GET /api/incidents?category=NETWORK
+     */
+    @GetMapping
+    public List<IncidentResponse> searchIncidents(
+            @RequestParam(required = false) String severity,
+            @RequestParam(required = false) String category) {
+
+        if (severity != null && category != null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Only one filter may be specified at a time"
+            );
+        }
+
+        if (severity == null && category == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Either severity or category must be provided"
+            );
+        }
+
+        return incidentService.searchIncidents(severity, category)
+                .stream()
+                .map(incident -> IncidentResponse.builder()
+                        .incidentId(incident.getIncidentId())
+                        .description(incident.getDescription())
+                        .createdAt(incident.getCreatedAt())
+                        .build())
+                .toList();
+    }
 }

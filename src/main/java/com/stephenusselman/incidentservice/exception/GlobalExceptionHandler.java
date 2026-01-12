@@ -31,6 +31,19 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Handles illegal argument exceptions.
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalArgument(
+        IllegalArgumentException ex) {
+
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
      * Handles generic exceptions.
      */
     @ExceptionHandler(Exception.class)

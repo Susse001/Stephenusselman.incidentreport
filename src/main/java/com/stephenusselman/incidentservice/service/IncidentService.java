@@ -1,6 +1,7 @@
 package com.stephenusselman.incidentservice.service;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -32,13 +33,37 @@ public class IncidentService {
         incident.setDescription(request.getDescription());
         incident.setSeverity(request.getSeverity());
         incident.setCategory(request.getCategory());
+        incident.setReportedBy(request.getReportedBy());
         incident.setCreatedAt(Instant.now().toString());
 
         repository.save(incident);
         return incident;
     }
 
+    /**
+     * Gets the Incident associated with provided id as a string
+     *
+     * @param id the id
+     * 
+     * @return the Incident
+     */
     public Incident getIncident(String id) {
         return repository.findById(id);
+    }
+
+    /**
+     * Query incidents by severity OR category.
+     */
+    public List<Incident> searchIncidents(String severity, String category) {
+
+        if (severity != null) {
+            return repository.findBySeverity(severity);
+        }
+
+        if (category != null) {
+            return repository.findByCategory(category);
+        }
+
+        throw new IllegalArgumentException("Either severity or category must be provided");
     }
 }
