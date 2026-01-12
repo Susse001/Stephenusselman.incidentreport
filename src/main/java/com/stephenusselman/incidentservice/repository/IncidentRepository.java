@@ -6,6 +6,7 @@ import com.stephenusselman.incidentservice.domain.Incident;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
@@ -14,6 +15,7 @@ import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbIndex;
 import software.amazon.awssdk.enhanced.dynamodb.model.Page;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
 /**
  * Repository for managing Incident entities in DynamoDB.
@@ -85,4 +87,52 @@ public class IncidentRepository {
 
         return results;
     }
+
+    /**
+     * Queries incidents by severity using the {@code severity-index}..
+     *
+     * @param severity the severity value to query (GSI partition key)
+     * @param limit the maximum number of items to return
+     * @param lastEvaluatedKey the pagination cursor from a previous query,
+     *                         or {@code null} to start from the beginning
+     * @return a {@link Page} containing incidents and pagination metadata
+     */
+    public Page<Incident> queryBySeverity(String severity, int limit, Map<String, AttributeValue> lastEvaluatedKey) {
+        return table.index("severity-index")
+                .query(r -> r
+                        .queryConditional(
+                            QueryConditional.keyEqualTo(k -> k.partitionValue(severity))
+                        )
+                        .limit(limit)
+                        .exclusiveStartKey(lastEvaluatedKey)
+                )
+                .iterator()
+                .next();
+        }
+    
+    /**
+     * Queries incidents by category using the {@code category-index}.
+     *
+     * @param category the category value to query (GSI partition key)
+     * @param limit the maximum number of items to return
+     * @param lastEvaluatedKey the pagination cursor from a previous query,
+     *                         or {@code null} to start from the beginning
+     * @return a {@link Page} containing incidents and pagination metadata
+     */
+    public Page<Incident> queryByCategory(String category, int limit, Map<String, AttributeValue> lastEvaluatedKey) {
+        return table.index("category-index")
+                .query(r -> r
+                        .queryConditional(
+                                QueryConditional.keyEqualTo(
+                                        Key.builder()
+                                                .partitionValue(category)
+                                                .build()
+                                )
+                        )
+                        .limit(limit)
+                        .exclusiveStartKey(lastEvaluatedKey)
+                )
+                .iterator()
+                .next();
+        }
 }

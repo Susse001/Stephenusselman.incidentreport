@@ -1,16 +1,21 @@
 package com.stephenusselman.incidentservice;
 
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.time.Instant;
+import java.util.List;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stephenusselman.incidentservice.controller.IncidentController;
 import com.stephenusselman.incidentservice.domain.Incident;
 import com.stephenusselman.incidentservice.dto.CreateIncidentRequest;
+import com.stephenusselman.incidentservice.dto.IncidentResponse;
+import com.stephenusselman.incidentservice.dto.PagedIncidentResponse;
 import com.stephenusselman.incidentservice.service.IncidentService;
 
 import org.junit.jupiter.api.Test;
@@ -34,6 +39,10 @@ public class IncidentControllerTest {
     @MockitoBean
     private IncidentService incidentService;
 
+    /**
+     * Ensures that a POST request missing the description field
+     * returns a 400 Bad Request with the correct validation error.
+     */
     @Test
     void whenMissingDescription_thenReturns400() throws Exception {
         CreateIncidentRequest request = new CreateIncidentRequest();
@@ -48,6 +57,10 @@ public class IncidentControllerTest {
             .andExpect(jsonPath("$.description").value("Description is required"));
     }
 
+    /**
+     * Ensures that a valid POST request successfully creates an incident
+     * and returns the expected IncidentResponse with 200 OK.
+     */
     @Test
     void whenValidRequest_thenReturns200() throws Exception {
         CreateIncidentRequest request = new CreateIncidentRequest();
@@ -70,8 +83,60 @@ public class IncidentControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/incidents")
             .contentType(MediaType.APPLICATION_JSON)
             .content(new ObjectMapper().writeValueAsString(request)))
-            .andExpect(status().isOk())   // 200
+            .andExpect(status().isOk())
             .andExpect(jsonPath("$.incidentId").value("123"))
             .andExpect(jsonPath("$.description").value("Test incident"));
-}
+    }
+
+    /**
+     * Test fetching the first page of incidents filtered by severity.
+     */
+    @Test
+    void whenQueryBySeverity_thenReturnsPagedResults() throws Exception {
+        Incident incident1 = new Incident();
+        incident1.setIncidentId("1");
+        incident1.setDescription("Network outage");
+        incident1.setSeverity("HIGH");
+        incident1.setCategory("NETWORK");
+        incident1.setCreatedAt(Instant.now().toString());
+
+        Incident incident2 = new Incident();
+        incident2.setIncidentId("2");
+        incident2.setDescription("Database issue");
+        incident2.setSeverity("HIGH");
+        incident2.setCategory("NETWORK");
+        incident2.setCreatedAt(Instant.now().toString());
+
+        IncidentResponse response1 = IncidentResponse.builder()
+        .incidentId(incident1.getIncidentId())
+        .description(incident1.getDescription())
+        .createdAt(incident1.getCreatedAt())
+        .build();
+
+        IncidentResponse response2 = IncidentResponse.builder()
+        .incidentId(incident2.getIncidentId())
+        .description(incident2.getDescription())
+        .createdAt(incident2.getCreatedAt())
+        .build();
+
+        PagedIncidentResponse pagedResponse = PagedIncidentResponse.builder()
+                .items(List.of(response1, response2))
+                .lastKey("nextKey123")
+                .build();
+
+
+        when(incidentService.searchIncidents(Mockito.eq("HIGH"), Mockito.isNull(), Mockito.eq(10), Mockito.isNull()))
+                .thenReturn(pagedResponse);
+
+        mockMvc.perform(get("/api/incidents")
+                        .param("severity", "HIGH")
+                        .param("limit", "10")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items[0].incidentId").value("1"))
+                .andExpect(jsonPath("$.items[0].description").value("Network outage"))
+                .andExpect(jsonPath("$.items[1].incidentId").value("2"))
+                .andExpect(jsonPath("$.items[1].description").value("Database issue"))
+                .andExpect(jsonPath("$.lastKey").value("nextKey123"));
+    }
 }
