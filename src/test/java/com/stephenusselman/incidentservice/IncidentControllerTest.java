@@ -17,6 +17,7 @@ import com.stephenusselman.incidentservice.dto.CreateIncidentRequest;
 import com.stephenusselman.incidentservice.dto.IncidentResponse;
 import com.stephenusselman.incidentservice.dto.PagedIncidentResponse;
 import com.stephenusselman.incidentservice.service.IncidentService;
+import com.stephenusselman.incidentservice.service.ai.IncidentEnrichmentCoordinator;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -38,6 +39,9 @@ public class IncidentControllerTest {
 
     @MockitoBean
     private IncidentService incidentService;
+
+    @MockitoBean
+    private IncidentEnrichmentCoordinator enrichmentCoordinator;
 
     /**
      * Ensures that a POST request missing the description field
@@ -65,27 +69,33 @@ public class IncidentControllerTest {
     void whenValidRequest_thenReturns200() throws Exception {
         CreateIncidentRequest request = new CreateIncidentRequest();
         request.setDescription("Test incident");
-        request.setSeverity("HIGH");
-        request.setCategory("NETWORK");
         request.setReportedBy("User123");
 
         Incident incident = new Incident();
         incident.setIncidentId("123"); 
         incident.setDescription(request.getDescription());
-        incident.setSeverity(request.getSeverity());
-        incident.setCategory(request.getCategory());
         incident.setReportedBy(request.getReportedBy());
         incident.setCreatedAt(Instant.now().toString());
+        incident.setAiStatus("ENRICHED");
+        incident.setSeverity("HIGH");
+        incident.setCategory("NETWORK");
+        incident.setAiSummary("Mock summary");
+        incident.setRecommendedAction("Take action");
 
         Mockito.when(incidentService.createIncident(Mockito.any(CreateIncidentRequest.class)))
            .thenReturn(incident);
 
+        Mockito.doNothing().when(enrichmentCoordinator).enrichIncident(Mockito.any(Incident.class));
+
         mockMvc.perform(MockMvcRequestBuilders.post("/api/incidents")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(new ObjectMapper().writeValueAsString(request)))
+            .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.incidentId").value("123"))
-            .andExpect(jsonPath("$.description").value("Test incident"));
+            .andExpect(jsonPath("$.description").value("Test incident"))
+            .andExpect(jsonPath("$.aiStatus").value("ENRICHED"))
+            .andExpect(jsonPath("$.severity").value("HIGH"))
+            .andExpect(jsonPath("$.category").value("NETWORK"));
     }
 
     /**
@@ -108,16 +118,26 @@ public class IncidentControllerTest {
         incident2.setCreatedAt(Instant.now().toString());
 
         IncidentResponse response1 = IncidentResponse.builder()
-        .incidentId(incident1.getIncidentId())
-        .description(incident1.getDescription())
-        .createdAt(incident1.getCreatedAt())
-        .build();
+                .incidentId(incident1.getIncidentId())
+                .description(incident1.getDescription())
+                .createdAt(incident1.getCreatedAt())
+                .aiStatus(incident1.getAiStatus())
+                .severity(incident1.getSeverity())
+                .category(incident1.getCategory())
+                .aiSummary(incident1.getAiSummary())
+                .recommendedAction(incident1.getRecommendedAction())
+                .build();
 
         IncidentResponse response2 = IncidentResponse.builder()
-        .incidentId(incident2.getIncidentId())
-        .description(incident2.getDescription())
-        .createdAt(incident2.getCreatedAt())
-        .build();
+                .incidentId(incident2.getIncidentId())
+                .description(incident2.getDescription())
+                .createdAt(incident2.getCreatedAt())
+                .aiStatus(incident2.getAiStatus())
+                .severity(incident2.getSeverity())
+                .category(incident2.getCategory())
+                .aiSummary(incident2.getAiSummary())
+                .recommendedAction(incident2.getRecommendedAction())
+                .build();
 
         PagedIncidentResponse pagedResponse = PagedIncidentResponse.builder()
                 .items(List.of(response1, response2))

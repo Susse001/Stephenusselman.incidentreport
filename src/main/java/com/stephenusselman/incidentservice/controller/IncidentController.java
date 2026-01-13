@@ -11,12 +11,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import com.stephenusselman.incidentservice.domain.Incident;
 import com.stephenusselman.incidentservice.dto.CreateIncidentRequest;
 import com.stephenusselman.incidentservice.dto.IncidentResponse;
 import com.stephenusselman.incidentservice.dto.PagedIncidentResponse;
-import com.stephenusselman.incidentservice.service.IncidentService; 
+import com.stephenusselman.incidentservice.service.IncidentService;
+import com.stephenusselman.incidentservice.service.ai.IncidentEnrichmentCoordinator;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,24 +34,35 @@ public class IncidentController {
     /** Service layer for handling incident-related operations */
     private final IncidentService incidentService;
 
+    /** Service layer for handling AI-enrichment incident operations */
+    private final IncidentEnrichmentCoordinator enrichmentCoordinator;
+
     /**
-     * Create a new incident based on the request payload.
+     * Create a new incident abd trigger AI enrichment
      * 
-     * @param request the incident creation request containing details such as
-     *                description and reporter information
-     * @return an {@link IncidentResponse} containing the ID, description, and
-     *         creation timestamp of the newly created incident
+     * @param request incident creation request
+     * @return an {@link IncidentResponse} containing ID, AI fields, and AI status
      */
     @PostMapping
-    public IncidentResponse createIncident( @Valid @RequestBody CreateIncidentRequest request) {
+    public ResponseEntity<IncidentResponse> createIncident( @Valid @RequestBody CreateIncidentRequest request) {
 
         Incident incident = incidentService.createIncident(request);
 
-        return IncidentResponse.builder()
+        enrichmentCoordinator.enrichIncident(incident);
+
+        IncidentResponse response = IncidentResponse.builder()
                 .incidentId(incident.getIncidentId())
                 .description(incident.getDescription())
                 .createdAt(incident.getCreatedAt())
+                .aiStatus(incident.getAiStatus())
+                .severity(incident.getSeverity())
+                .category(incident.getCategory())
+                .aiSummary(incident.getAiSummary())
+                .recommendedAction(incident.getRecommendedAction())
+                .aiErrorMessage(incident.getAiErrorMessage())
                 .build();
+
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -72,6 +85,12 @@ public class IncidentController {
             .incidentId(incident.getIncidentId())
             .description(incident.getDescription())
             .createdAt(incident.getCreatedAt())
+            .aiStatus(incident.getAiStatus())
+            .severity(incident.getSeverity())
+            .category(incident.getCategory())
+            .aiSummary(incident.getAiSummary())
+            .recommendedAction(incident.getRecommendedAction())
+            .aiErrorMessage(incident.getAiErrorMessage())
             .build();
     }
 

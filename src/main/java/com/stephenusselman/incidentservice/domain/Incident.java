@@ -1,17 +1,10 @@
 package com.stephenusselman.incidentservice.domain;
 
-import java.time.Instant;
-
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondaryPartitionKey;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondarySortKey;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbConvertedBy;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * Domain entity representing an Incident in the Smart Incident Service.
@@ -38,6 +31,18 @@ public class Incident {
 
     /** Timestamp when the incident was created */
     private String createdAt;
+
+    /** AI enrichment status for the incident */
+    private String aiStatus;
+
+    /** AI-generated summary of the incident */
+    private String aiSummary;
+
+    /** AI-recommended remediation action */
+    private String recommendedAction;
+
+    /** Error message if AI enrichment fails */
+    private String aiErrorMessage;
 
     /**
      * Gets the unique identifier of the incident.
@@ -155,4 +160,75 @@ public class Incident {
         this.createdAt = createdAt;
     }
     
+    /**
+     * Gets the AI enrichment status of the incident.
+     *
+     * @return the AI status
+     */
+    public String getAiStatus() {
+        return aiStatus;
+    }
+
+    /**
+     * Sets the AI enrichment status of the incident.
+     *
+     * @param aiStatus the AI status
+     */
+    public void setAiStatus(String aiStatus) {
+        this.aiStatus = aiStatus;
+    }
+
+    /**
+     * Gets the AI-generated summary.
+     *
+     * @return the AI summary
+     */
+    public String getAiSummary() {
+        return aiSummary;
+    }
+
+    /**
+     * Sets the AI-generated summary.
+     *
+     * @param aiSummary the AI summary
+     */
+    public void setAiSummary(String aiSummary) {
+        this.aiSummary = aiSummary;
+    }
+
+    /**
+     * Gets the AI-recommended remediation action.
+     *
+     * @return the recommended action
+     */
+    public String getRecommendedAction() {
+        return recommendedAction;
+    }
+
+    /**
+     * Sets the AI-recommended remediation action.
+     *
+     * @param recommendedAction the action
+     */
+    public void setRecommendedAction(String recommendedAction) {
+        this.recommendedAction = recommendedAction;
+    }
+
+    /**
+     * Gets the AI error message if enrichment failed.
+     *
+     * @return the AI error message
+     */
+    public String getAiErrorMessage() {
+        return aiErrorMessage;
+    }
+
+    /**
+     * Sets the AI error message.
+     *
+     * @param aiErrorMessage the error message
+     */
+    public void setAiErrorMessage(String aiErrorMessage) {
+        this.aiErrorMessage = aiErrorMessage;
+    }
 }

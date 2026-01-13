@@ -39,25 +39,11 @@ class CreateIncidentRequestTest {
     }
 
     @Test
-    void testValidationConstraints() {
-        CreateIncidentRequest request = new CreateIncidentRequest();
-        // Intentionally leave fields null to trigger validation errors
-        Set<ConstraintViolation<CreateIncidentRequest>> violations = validator.validate(request);
-
-        assertFalse(violations.isEmpty());
-        // Print violations for debugging
-        violations.forEach(v -> System.out.println(v.getPropertyPath() + " : " + v.getMessage()));
-    }
-
-    @Test
     void testValidRequestPassesValidation() {
-        CreateIncidentRequest request = new CreateIncidentRequest();
-        request.setDescription("Valid description");
-        request.setSeverity("HIGH");
-        request.setCategory("NETWORK");
-        request.setReportedBy("User123");
-
-        Set<ConstraintViolation<CreateIncidentRequest>> violations = validator.validate(request);
-        assertTrue(violations.isEmpty());
-    }
+    CreateIncidentRequest request = new CreateIncidentRequest();
+    request.setDescription("Valid description");
+    request.setReportedBy("User123");
+    Set<ConstraintViolation<CreateIncidentRequest>> violations = validator.validate(request);
+    assertTrue(violations.isEmpty());
+}
 }

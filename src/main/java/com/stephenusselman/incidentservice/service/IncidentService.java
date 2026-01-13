@@ -37,10 +37,10 @@ public class IncidentService {
         Incident incident = new Incident();
         incident.setIncidentId(UUID.randomUUID().toString());
         incident.setDescription(request.getDescription());
-        incident.setSeverity(request.getSeverity());
-        incident.setCategory(request.getCategory());
         incident.setReportedBy(request.getReportedBy());
         incident.setCreatedAt(Instant.now().toString());
+
+        incident.setAiStatus("PENDING");
 
         repository.save(incident);
         return incident;

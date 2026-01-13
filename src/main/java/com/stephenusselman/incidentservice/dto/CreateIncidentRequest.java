@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * Data Transfer Object representing a request to create a new incident.
+ * Severity and category are optional, AI may enrich them if not provided.
  */
 @Data
 @NoArgsConstructor
@@ -18,12 +19,10 @@ public class CreateIncidentRequest {
     @Size(max = 500, message = "Description cannot exceed 500 characters")
     private String description;
 
-    /** Severity Level of the incident */
-    @NotBlank(message = "Severity is required")
+    /** Optional: Severity Level of the incident */
     private String severity;
 
-    /** Category of the incident */
-    @NotBlank(message = "Category is required")
+    /** Optional: Category of the incident */
     private String category;
 
     /** Name or identifier of the reporter submitting the incident */

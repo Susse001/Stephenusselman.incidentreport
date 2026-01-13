@@ -52,4 +52,20 @@ Example GET Request:
 
 GET /api/incidents?severity=HIGH&limit=10
 
---
+---
+
+## AI Responsibility
+
+# AI is responsible for:
+
+- Severity classification 
+- Category classification 
+- Natural-language summary 
+- Suggested remediation 
+
+# AI is NOT responsible for:
+
+- Primary persistence
+- Validation of required fields
+- Authorization
+- Analytics
