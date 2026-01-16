@@ -10,6 +10,7 @@ import com.stephenusselman.incidentservice.dto.ai.IncidentEnrichmentResult;
 import com.stephenusselman.incidentservice.repository.IncidentRepository;
 import com.stephenusselman.incidentservice.service.IncidentService;
 import com.stephenusselman.incidentservice.service.ai.AiEnrichmentService;
+import com.stephenusselman.incidentservice.service.ai.IncidentEnrichmentCoordinator;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -21,8 +22,12 @@ public class IncidentServiceTest {
     @Mock
     private IncidentRepository incidentRepository;
 
+    
     @Mock
     private AiEnrichmentService aiEnrichmentService;
+
+    @Mock
+    private IncidentEnrichmentCoordinator AiEnrichmentCoordinator;
 
     @InjectMocks
     private IncidentService incidentService;
@@ -52,6 +57,6 @@ public class IncidentServiceTest {
 
         incidentService.createIncident(request);
 
-        verify(incidentRepository, times(2)).save(org.mockito.ArgumentMatchers.any(Incident.class));
+        verify(incidentRepository, times(1)).save(org.mockito.ArgumentMatchers.any(Incident.class));
     }
 }

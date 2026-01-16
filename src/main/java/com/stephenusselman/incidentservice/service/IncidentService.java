@@ -16,6 +16,7 @@ import com.stephenusselman.incidentservice.dto.ai.IncidentEnrichmentRequest;
 import com.stephenusselman.incidentservice.dto.ai.IncidentEnrichmentResult;
 import com.stephenusselman.incidentservice.repository.IncidentRepository;
 import com.stephenusselman.incidentservice.service.ai.AiEnrichmentService;
+import com.stephenusselman.incidentservice.service.ai.IncidentEnrichmentCoordinator;
 
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.enhanced.dynamodb.model.Page;
@@ -30,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 public class IncidentService {
 
     private final IncidentRepository repository;
-    private final AiEnrichmentService aiEnrichmentService;
+    private final IncidentEnrichmentCoordinator enrichmentCoordinator;
 
     /**
      * Creates a new incident based on the input request.
@@ -49,22 +50,8 @@ public class IncidentService {
 
         repository.save(incident);
 
-        IncidentEnrichmentRequest aiRequest = new IncidentEnrichmentRequest(
-                incident.getIncidentId(),
-                incident.getDescription(),
-                incident.getReportedBy(),
-                incident.getCreatedAt()
-        );
+        enrichmentCoordinator.enrichIncidentAsync(incident);
 
-        IncidentEnrichmentResult aiResult = aiEnrichmentService.enrichIncident(aiRequest);
-
-        incident.setSeverity(aiResult.getSeverity());
-        incident.setCategory(aiResult.getCategory());
-        incident.setAiSummary(aiResult.getSummary());
-        incident.setRecommendedAction(aiResult.getRecommendedAction());
-        incident.setAiStatus("ENRICHED");
-
-        repository.save(incident);
         return incident;
     }
 

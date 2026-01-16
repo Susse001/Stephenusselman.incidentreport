@@ -48,12 +48,11 @@ public class IncidentController {
 
         Incident incident = incidentService.createIncident(request);
 
-        enrichmentCoordinator.enrichIncident(incident);
-
         IncidentResponse response = IncidentResponse.builder()
                 .incidentId(incident.getIncidentId())
                 .description(incident.getDescription())
                 .createdAt(incident.getCreatedAt())
+                .reportedBy(incident.getReportedBy())
                 .aiStatus(incident.getAiStatus())
                 .severity(incident.getSeverity())
                 .category(incident.getCategory())
@@ -85,6 +84,7 @@ public class IncidentController {
             .incidentId(incident.getIncidentId())
             .description(incident.getDescription())
             .createdAt(incident.getCreatedAt())
+            .reportedBy(incident.getReportedBy())
             .aiStatus(incident.getAiStatus())
             .severity(incident.getSeverity())
             .category(incident.getCategory())

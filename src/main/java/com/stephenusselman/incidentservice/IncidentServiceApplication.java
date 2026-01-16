@@ -2,11 +2,13 @@ package com.stephenusselman.incidentservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * Main Spring Boot application class for the Smart Incident Service.
  */
 @SpringBootApplication(scanBasePackages = "com.stephenusselman.incidentservice")
+@EnableAsync
 public class IncidentServiceApplication {
 
 	/**
