@@ -6,6 +6,7 @@ TASK:
 Analyze the incident below and return a JSON object that STRICTLY matches the schema provided.
 Do not include any text outside of the JSON object.
 Do not include explanations or commentary.
+Return a single-line JSON object with no trailing commas.
 
 SCHEMA:
 {
@@ -17,12 +18,13 @@ SCHEMA:
 
 RULES:
 - Use ONLY the allowed enum values.
+- All fields are REQUIRED and must be non-empty strings.
 - If information is insufficient, infer the MOST LIKELY classification.
 - Do not invent technical details not present in the incident.
 - Keep all text concise and professional.
 
 INCIDENT:
-Title: {{title}}
+Incident ID: {{incidentId}}
 Description: {{description}}
-Source: {{source}}
-Timestamp: {{timestamp}}
+Reported By: {{reportedBy}}
+Created At: {{createdAt}}

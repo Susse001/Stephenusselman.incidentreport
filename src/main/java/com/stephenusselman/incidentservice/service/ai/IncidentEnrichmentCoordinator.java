@@ -38,7 +38,7 @@ public class IncidentEnrichmentCoordinator {
 
         try {
             // Call AI service
-            IncidentEnrichmentResult result = aiEnrichmentService.enrich(request);
+            IncidentEnrichmentResult result = aiEnrichmentService.enrichIncident(request);
 
             // Validate AI output
             validate(result);

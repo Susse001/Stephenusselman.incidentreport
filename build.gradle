@@ -39,9 +39,14 @@ dependencies {
 	// Http Client
 	implementation 'software.amazon.awssdk:url-connection-client'
 	
+	// OpenAI
+	implementation "com.openai:openai-java:4.15.0"
+	
+	// Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	
+	// Testing
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

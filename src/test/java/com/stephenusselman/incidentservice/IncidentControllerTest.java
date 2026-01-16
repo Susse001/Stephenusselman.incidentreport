@@ -17,6 +17,7 @@ import com.stephenusselman.incidentservice.dto.CreateIncidentRequest;
 import com.stephenusselman.incidentservice.dto.IncidentResponse;
 import com.stephenusselman.incidentservice.dto.PagedIncidentResponse;
 import com.stephenusselman.incidentservice.service.IncidentService;
+import com.stephenusselman.incidentservice.service.ai.AiEnrichmentService;
 import com.stephenusselman.incidentservice.service.ai.IncidentEnrichmentCoordinator;
 
 import org.junit.jupiter.api.Test;
@@ -42,6 +43,9 @@ public class IncidentControllerTest {
 
     @MockitoBean
     private IncidentEnrichmentCoordinator enrichmentCoordinator;
+
+    @MockitoBean
+    private AiEnrichmentService enrichmentService;
 
     /**
      * Ensures that a POST request missing the description field
