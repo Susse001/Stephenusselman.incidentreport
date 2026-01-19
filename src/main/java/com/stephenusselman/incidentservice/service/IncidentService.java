@@ -12,10 +12,7 @@ import com.stephenusselman.incidentservice.domain.Incident;
 import com.stephenusselman.incidentservice.dto.CreateIncidentRequest;
 import com.stephenusselman.incidentservice.dto.IncidentResponse;
 import com.stephenusselman.incidentservice.dto.PagedIncidentResponse;
-import com.stephenusselman.incidentservice.dto.ai.IncidentEnrichmentRequest;
-import com.stephenusselman.incidentservice.dto.ai.IncidentEnrichmentResult;
 import com.stephenusselman.incidentservice.repository.IncidentRepository;
-import com.stephenusselman.incidentservice.service.ai.AiEnrichmentService;
 import com.stephenusselman.incidentservice.service.ai.IncidentEnrichmentCoordinator;
 
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
@@ -141,7 +138,14 @@ public class IncidentService {
         return IncidentResponse.builder()
                 .incidentId(incident.getIncidentId())
                 .description(incident.getDescription())
+                .severity(incident.getSeverity())
+                .category(incident.getCategory())
+                .reportedBy(incident.getReportedBy())
                 .createdAt(incident.getCreatedAt())
+                .aiStatus(incident.getAiStatus())
+                .aiSummary(incident.getAiSummary())
+                .recommendedAction(incident.getRecommendedAction())
+                .aiErrorMessage(incident.getAiErrorMessage())
                 .build();
     }
 

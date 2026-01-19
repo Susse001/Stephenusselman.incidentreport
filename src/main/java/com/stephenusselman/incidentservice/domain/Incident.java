@@ -1,5 +1,6 @@
 package com.stephenusselman.incidentservice.domain;
 
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondaryPartitionKey;
@@ -51,6 +52,7 @@ public class Incident {
      * @return the incident ID
      */
     @DynamoDbPartitionKey
+    @DynamoDbAttribute("incidentId")
     public String getIncidentId() {
         return incidentId;
     }
@@ -69,6 +71,7 @@ public class Incident {
      *
      * @return the description
      */
+    @DynamoDbAttribute("description")
     public String getDescription() {
         return description;
     }
@@ -89,6 +92,7 @@ public class Incident {
      * @return the severity
      */
     @DynamoDbSecondaryPartitionKey(indexNames = "severity-index")
+    @DynamoDbAttribute("severity")
     public String getSeverity() {
         return severity;
     }
@@ -109,6 +113,7 @@ public class Incident {
      * @return the category
      */
     @DynamoDbSecondaryPartitionKey(indexNames = "category-index")
+    @DynamoDbAttribute("category")
     public String getCategory() {
         return category;
     }
@@ -127,6 +132,7 @@ public class Incident {
      *
      * @return the reporter
      */
+    @DynamoDbAttribute("reportedBy")
     public String getReportedBy() {
         return reportedBy;
     }
@@ -147,6 +153,7 @@ public class Incident {
      * @return the creation timestamp as a String
      */
     @DynamoDbSecondarySortKey(indexNames = {"severity-index", "category-index"})
+    @DynamoDbAttribute("createdAt")
     public String getCreatedAt() {
         return createdAt;
     }
@@ -165,6 +172,7 @@ public class Incident {
      *
      * @return the AI status
      */
+    @DynamoDbAttribute("aiStatus")
     public String getAiStatus() {
         return aiStatus;
     }
@@ -183,6 +191,7 @@ public class Incident {
      *
      * @return the AI summary
      */
+    @DynamoDbAttribute("aiSummary")
     public String getAiSummary() {
         return aiSummary;
     }
@@ -201,6 +210,7 @@ public class Incident {
      *
      * @return the recommended action
      */
+    @DynamoDbAttribute("recommendedAction")
     public String getRecommendedAction() {
         return recommendedAction;
     }
@@ -219,6 +229,7 @@ public class Incident {
      *
      * @return the AI error message
      */
+    @DynamoDbAttribute("aiErrorMessage")
     public String getAiErrorMessage() {
         return aiErrorMessage;
     }

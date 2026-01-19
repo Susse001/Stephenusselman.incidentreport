@@ -40,6 +40,13 @@ public class IncidentRepository {
     }
 
     /**
+     * Updates an existing item in DynamoDB.
+     */
+    public void update(Incident incident) {
+        table.updateItem(incident);
+    }
+
+    /**
      * Retrieves an incident by its ID.
      */
     public Incident findById(String incidentId) {

@@ -60,7 +60,7 @@ public class AiEnrichmentService {
 
         Response response = openAIClient.responses().create(
                 ResponseCreateParams.builder()
-                        .model("gpt-5-mini")
+                        .model("gpt-5-nano")
                         .input(prompt)
                         .build()
         );
