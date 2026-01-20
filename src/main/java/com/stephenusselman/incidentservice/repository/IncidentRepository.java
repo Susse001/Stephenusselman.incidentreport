@@ -56,6 +56,18 @@ public class IncidentRepository {
     }
 
     /**
+     * Deletes all items in the Incidents table.
+     */
+    public void deleteAll() {
+        List<Incident> itemsToDelete = new ArrayList<>();
+        table.scan().forEach(page -> itemsToDelete.addAll(page.items()));
+
+        for (Incident incident : itemsToDelete) {
+            table.deleteItem(incident);
+        }
+    }
+
+    /**
      * Query incidents by severity using the severity GSI.
      */
     public List<Incident> findBySeverity(String severity) {
