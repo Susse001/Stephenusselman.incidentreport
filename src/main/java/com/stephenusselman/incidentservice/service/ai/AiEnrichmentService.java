@@ -137,5 +137,5 @@ public class AiEnrichmentService {
             .findFirst()
             .orElseThrow(() -> new IllegalStateException(
                     "No text output returned from AI response"));
-}
+    }
 }

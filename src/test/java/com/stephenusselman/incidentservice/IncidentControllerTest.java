@@ -1,5 +1,7 @@
 package com.stephenusselman.incidentservice;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -17,7 +19,6 @@ import com.stephenusselman.incidentservice.dto.CreateIncidentRequest;
 import com.stephenusselman.incidentservice.dto.IncidentResponse;
 import com.stephenusselman.incidentservice.dto.PagedIncidentResponse;
 import com.stephenusselman.incidentservice.service.IncidentService;
-import com.stephenusselman.incidentservice.service.ai.AiEnrichmentService;
 import com.stephenusselman.incidentservice.service.ai.IncidentEnrichmentCoordinator;
 
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.server.ResponseStatusException;
 
 @WebMvcTest(IncidentController.class)
 public class IncidentControllerTest {
@@ -43,9 +45,6 @@ public class IncidentControllerTest {
 
     @MockitoBean
     private IncidentEnrichmentCoordinator enrichmentCoordinator;
-
-    @MockitoBean
-    private AiEnrichmentService enrichmentService;
 
     /**
      * Ensures that a POST request missing the description field
@@ -100,6 +99,49 @@ public class IncidentControllerTest {
             .andExpect(jsonPath("$.aiStatus").value("ENRICHED"))
             .andExpect(jsonPath("$.severity").value("HIGH"))
             .andExpect(jsonPath("$.category").value("NETWORK"));
+    }
+
+
+    /**
+    * Ensures retrieving an existing incident by ID returns
+    * HTTP 200 OK and the expected incident data.
+    */
+    @Test
+    void whenGetIncidentExists_thenReturnsIncident() throws Exception {
+        Incident incident = new Incident();
+        incident.setIncidentId("123");
+        incident.setDescription("Test incident");
+        incident.setReportedBy("user");
+        incident.setCreatedAt(Instant.now().toString());
+        incident.setAiStatus("ENRICHED");
+
+        when(incidentService.getIncident("123")).thenReturn(incident);
+
+        mockMvc.perform(get("/api/incidents/123"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.incidentId").value("123"))
+                .andExpect(jsonPath("$.description").value("Test incident"))
+                .andExpect(jsonPath("$.aiStatus").value("ENRICHED"));
+        }
+
+     /**
+     * Ensures that fetching a non-existent incident returns 404 NOT FOUND.
+     */
+    @Test
+    void whenGetIncidentNotFound_thenReturns404() throws Exception {
+        String incidentId = "nonexistent";
+
+        // Mock service to return null
+        when(incidentService.getIncident(incidentId)).thenReturn(null);
+
+        mockMvc.perform(get("/api/incidents/{id}", incidentId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(result -> {
+                    assertTrue(result.getResolvedException() instanceof ResponseStatusException);
+                    assertEquals("Incident not found",
+                            ((ResponseStatusException) result.getResolvedException()).getReason());
+                });
     }
 
     /**
@@ -162,5 +204,21 @@ public class IncidentControllerTest {
                 .andExpect(jsonPath("$.items[1].incidentId").value("2"))
                 .andExpect(jsonPath("$.items[1].description").value("Database issue"))
                 .andExpect(jsonPath("$.lastKey").value("nextKey123"));
+    }
+
+    /**
+     * Ensures that calling search without any filters returns 400 BAD REQUEST.
+     */
+    @Test
+    void whenNoFiltersProvided_thenReturns400() throws Exception {
+
+        mockMvc.perform(get("/api/incidents")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> {
+                    assertTrue(result.getResolvedException() instanceof ResponseStatusException);
+                    assertEquals("Either severity or category must be provided",
+                            ((ResponseStatusException) result.getResolvedException()).getReason());
+                });
     }
 }
