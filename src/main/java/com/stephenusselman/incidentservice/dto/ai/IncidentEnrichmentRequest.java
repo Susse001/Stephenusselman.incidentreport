@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+/**
+ * Request payload sent to the AI enrichment service.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

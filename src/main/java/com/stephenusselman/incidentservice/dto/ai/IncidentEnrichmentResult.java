@@ -5,6 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+/**
+ * Represents the result of AI-driven incident enrichment.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

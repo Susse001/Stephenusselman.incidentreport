@@ -13,6 +13,12 @@ import com.stephenusselman.incidentservice.service.IncidentService;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+* Seeds a fixed number of incidents after application startup.
+*
+* Each incident is created through the {@link IncidentService}, ensuring
+* that normal validation, persistence, and AI enrichment workflows are triggered.
+*/
 @Profile("seed")
 @Component
 @RequiredArgsConstructor
@@ -35,11 +41,7 @@ public class IncidentDataSeeder {
     );
 
     /**
-     * Seed incidents after the application is fully initialized.
-     * This guarantees:
-     * - DynamoDB tables exist
-     * - Repositories are wired
-     * - Async + AI enrichment pipelines are available
+     * Seeds a fixed number of incidents after application startup.
      */
     @EventListener(ApplicationReadyEvent.class)
     public void seedIncidents() {
@@ -53,6 +55,13 @@ public class IncidentDataSeeder {
         }
     }
 
+    /**
+     * Generates a synthetic incident description with randomized timing
+     * and impact severity.
+     *
+     * @param index the index of the incident being generated
+     * @return a human-readable incident description
+     */
     private String generateDescription(int index) {
         String base = BASE_DESCRIPTIONS.get(index % BASE_DESCRIPTIONS.size());
 
@@ -65,6 +74,11 @@ public class IncidentDataSeeder {
             + ".";
     }
 
+    /**
+     * Randomly selects an impact level label.
+     *
+     * @return a textual representation of impact severity
+     */
     private String randomImpact() {
         return switch (random.nextInt(3)) {
             case 0 -> "minor";

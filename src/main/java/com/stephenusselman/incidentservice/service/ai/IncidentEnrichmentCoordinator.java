@@ -18,6 +18,12 @@ import com.stephenusselman.incidentservice.dto.ai.IncidentEnrichmentResult;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Coordinates AI-based enrichment of {@link Incident} entities.
+ *
+ * Enrichment is executed asynchronously to avoid blocking the main request
+ * lifecycle and to isolate AI latency or failures from core incident creation.
+ */
 @Service
 @RequiredArgsConstructor
 public class IncidentEnrichmentCoordinator {
@@ -54,7 +60,6 @@ public class IncidentEnrichmentCoordinator {
             incident.getCreatedAt()
         );
 
-        // Validate request
         validate(request);
 
         int attempt = 0;
@@ -94,7 +99,12 @@ public class IncidentEnrichmentCoordinator {
     }
 
     /**
-     * Call AI service with timeout.
+     * Invokes the AI enrichment service with a hard timeout.
+     *
+     * @param request the enrichment request payload
+     * @param timeoutMs maximum time to wait for the AI response
+     * @return the AI enrichment result
+     * @throws Exception if the call fails or times out
      */
     private IncidentEnrichmentResult callAiWithTimeout(IncidentEnrichmentRequest request, long timeoutMs) throws Exception {
         Future<IncidentEnrichmentResult> future =
@@ -108,6 +118,12 @@ public class IncidentEnrichmentCoordinator {
         }
     }
 
+    /**
+     * Validates an object using Jakarta Bean Validation.
+     *
+     * @param obj the object to validate
+     * @throws RuntimeException if validation constraints are violated
+     */
     private void validate(Object obj) {
         Set<ConstraintViolation<Object>> violations = validator.validate(obj);
         if (!violations.isEmpty()) {
