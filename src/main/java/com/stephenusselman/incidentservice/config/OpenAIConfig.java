@@ -3,6 +3,7 @@ package com.stephenusselman.incidentservice.config;
 import com.openai.client.OpenAIClient;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,7 +19,13 @@ public class OpenAIConfig {
      * @return an initialized {@link OpenAIClient}
      */
     @Bean
-    public OpenAIClient openAIClient() {
-        return OpenAIOkHttpClient.fromEnv();
+    public OpenAIClient openAIClient(@Value("${openai.api-key}") String apiKey) {
+        if (apiKey == null || apiKey.isBlank()) {
+            throw new IllegalStateException("OPENAI_API_KEY is not configured");
+        }
+
+        return OpenAIOkHttpClient.builder()
+                .apiKey(apiKey)
+                .build();
     }
 }
