@@ -13,7 +13,6 @@ import java.util.List;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.stephenusselman.incidentservice.controller.IncidentController;
 import com.stephenusselman.incidentservice.domain.Incident;
 import com.stephenusselman.incidentservice.dto.CreateIncidentRequest;
 import com.stephenusselman.incidentservice.dto.IncidentResponse;

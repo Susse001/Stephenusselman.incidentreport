@@ -95,7 +95,7 @@ public class IncidentEnrichmentCoordinator {
                 }
             }
         }
-        repository.save(incident);
+        repository.update(incident);
     }
 
     /**

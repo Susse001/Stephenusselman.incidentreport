@@ -44,6 +44,8 @@ public class IncidentService {
         incident.setCreatedAt(Instant.now().toString());
 
         incident.setAiStatus("PENDING");
+        incident.setSeverity("PENDING");
+        incident.setCategory("PENDING");
 
         repository.save(incident);
 
