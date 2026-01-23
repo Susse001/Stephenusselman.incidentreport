@@ -1,4 +1,4 @@
-package com.stephenusselman.incidentservice;
+package com.stephenusselman.incidentservice.dto;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;

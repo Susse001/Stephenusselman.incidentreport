@@ -4,6 +4,7 @@ import org.springframework.stereotype.Repository;
 
 import com.stephenusselman.incidentservice.domain.Incident;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -153,5 +154,38 @@ public class IncidentRepository {
                 )
                 .iterator()
                 .next();
-        }
+     }
+    
+    /**
+     * Retrieves all incidents from the table.
+	 * @return a {@link Page} containing all matching incidents
+     */
+     public List<Incident> findAll() {
+        List<Incident> results = new ArrayList<>();
+
+        table.scan().forEach(page -> results.addAll(page.items()));
+
+        return results;
+     }
+
+     /**
+	 * Retrieves incidents whose createdAt timestamp falls within the given range.
+	 * @return a {@link Page} of all incidents that fall within the given range
+	 */
+	public List<Incident> findByCreatedAtBetween(Instant from, Instant to) {
+		List<Incident> results = new ArrayList<>();
+
+		table.scan(r -> r.filterExpression(
+				software.amazon.awssdk.enhanced.dynamodb.Expression.builder()
+					.expression("createdAt BETWEEN :from AND :to")
+					.expressionValues(Map.of(
+						":from", AttributeValue.fromS(from.toString()),
+						":to", AttributeValue.fromS(to.toString())
+					))
+					.build()
+			)
+		).forEach(page -> results.addAll(page.items()));
+
+		return results;
+	}
 }
